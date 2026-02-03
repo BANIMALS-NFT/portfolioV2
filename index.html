@@ -1,0 +1,1297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Advanced Landing V2</title>
+  <meta name="description" content="Advanced landing page with interactive motion background and GitHub projects." />
+  <style>
+    :root{
+      --bg0:#07080c;
+      --bg1:#0b0f18;
+      --panel:#0d1220cc;
+      --panel2:#0d1220f2;
+      --text:#e9ecf4;
+      --muted:#aab2c5;
+      --line:#1f2a44;
+      --accent:#ff4d7d;
+      --accent2:#6ee7ff;
+      --good:#31d0aa;
+      --shadow: 0 18px 70px rgba(0,0,0,.45);
+      --radius: 18px;
+      --max: 1120px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 900px at 20% 10%, rgba(110,231,255,.10), transparent 55%),
+                  radial-gradient(1100px 900px at 80% 30%, rgba(255,77,125,.10), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    /* Motion background */
+    #motion-bg{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:auto; /* interactive */
+    }
+
+    /* Subtle overlay grid */
+    .grid-overlay{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      opacity:.18;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(700px 500px at 50% 15%, black 55%, transparent 100%);
+    }
+
+    /* Top nav */
+    .nav{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:10;
+      display:flex;
+      justify-content:center;
+      padding:14px 16px;
+      background: linear-gradient(180deg, rgba(7,8,12,.86), rgba(7,8,12,.35));
+      backdrop-filter: blur(14px);
+      border-bottom:1px solid rgba(31,42,68,.55);
+    }
+    .nav-inner{
+      width:100%;
+      max-width:var(--max);
+      display:flex;
+      align-items:center;
+      gap:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:190px;
+      user-select:none;
+    }
+    .brand-badge{
+      width:30px;
+      height:30px;
+      border-radius:10px;
+      background:
+        radial-gradient(10px 10px at 30% 30%, rgba(255,255,255,.65), transparent 70%),
+        linear-gradient(135deg, rgba(110,231,255,.8), rgba(255,77,125,.85));
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .brand span{
+      font-weight:700;
+      letter-spacing:.04em;
+    }
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:1;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .nav a{
+      color:rgba(233,236,244,.92);
+      text-decoration:none;
+      font-size:13px;
+      padding:9px 12px;
+      border-radius:12px;
+      border:1px solid transparent;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+      letter-spacing:.02em;
+    }
+    .nav a:hover{
+      transform: translateY(-1px);
+      background: rgba(13,18,32,.55);
+      border-color: rgba(31,42,68,.85);
+      color:#fff;
+    }
+    .nav-actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      min-width:190px;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid rgba(31,42,68,.85);
+      background: rgba(13,18,32,.55);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:12px;
+      font-size:13px;
+      cursor:pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(13,18,32,.75);
+      border-color: rgba(110,231,255,.55);
+    }
+    .btn.primary{
+      border-color: rgba(255,77,125,.55);
+      background: linear-gradient(135deg, rgba(255,77,125,.85), rgba(110,231,255,.70));
+      color:#0b0f18;
+      font-weight:700;
+    }
+    .btn.primary:hover{
+      border-color: rgba(255,255,255,.22);
+    }
+
+    /* Page structure */
+    main{
+      position:relative;
+      z-index:2;
+    }
+
+    .section{
+      min-height:100vh;
+      padding: 110px 18px 48px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .wrap{
+      width:100%;
+      max-width:var(--max);
+    }
+
+    /* 3 horizontal containers */
+    .panel{
+      border:1px solid rgba(31,42,68,.70);
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(800px 340px at 30% 10%, rgba(110,231,255,.14), transparent 60%),
+        radial-gradient(900px 440px at 70% 30%, rgba(255,77,125,.12), transparent 60%);
+      opacity:.9;
+    }
+
+    /* Hero */
+    .hero{
+      padding: 54px 28px;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 22px;
+      align-items:center;
+    }
+    @media (max-width: 920px){
+      .hero{ grid-template-columns: 1fr; }
+      .brand{ min-width:auto; }
+      .nav-actions{ min-width:auto; }
+    }
+    .kicker{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      color:var(--muted);
+      font-size:13px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(31,42,68,.85);
+      background: rgba(13,18,32,.55);
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      box-shadow: 0 0 18px rgba(110,231,255,.35);
+    }
+    .hero h1{
+      margin: 14px 0 10px;
+      font-size: clamp(34px, 4.4vw, 62px);
+      line-height:1.02;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      text-shadow: 0 18px 60px rgba(0,0,0,.65);
+    }
+    .hero p{
+      margin: 0 0 18px;
+      color: rgba(233,236,244,.86);
+      max-width: 52ch;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .cta-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top: 10px;
+    }
+    .mini{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    /* Right hero card */
+    .statcard{
+      background: rgba(13,18,32,.62);
+      border:1px solid rgba(31,42,68,.70);
+      border-radius: 16px;
+      padding: 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .statgrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .stat{
+      border:1px solid rgba(31,42,68,.70);
+      background: rgba(7,8,12,.35);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .stat b{
+      display:block;
+      font-size: 20px;
+      letter-spacing:.02em;
+    }
+    .stat span{
+      display:block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .glowline{
+      height:1px;
+      width:100%;
+      background: linear-gradient(90deg, transparent, rgba(110,231,255,.6), rgba(255,77,125,.6), transparent);
+      opacity:.7;
+      margin: 12px 0;
+    }
+
+    /* About section */
+    .two-col{
+      padding: 44px 28px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 920px){
+      .two-col{ grid-template-columns: 1fr; }
+    }
+    .card{
+      border:1px solid rgba(31,42,68,.70);
+      background: rgba(13,18,32,.62);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size: 20px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .card p{
+      margin:0;
+      color: rgba(233,236,244,.84);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .bullets{
+      margin-top: 14px;
+      display:grid;
+      gap: 10px;
+    }
+    .bullet{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(7,8,12,.28);
+      border:1px solid rgba(31,42,68,.55);
+    }
+    .ico{
+      width:28px; height:28px; border-radius:10px;
+      background: radial-gradient(10px 10px at 30% 30%, rgba(255,255,255,.55), transparent 70%),
+                  linear-gradient(135deg, rgba(110,231,255,.7), rgba(49,208,170,.55));
+      border:1px solid rgba(255,255,255,.12);
+      flex: 0 0 auto;
+    }
+    .bullet b{ display:block; font-size: 13px; }
+    .bullet span{ display:block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+    /* Projects */
+    .projects{
+      padding: 40px 28px;
+    }
+    .projects-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 14px;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+    .projects-head h2{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+    .projects-head p{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 68ch;
+      line-height: 1.5;
+    }
+    .userbox{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .input{
+      background: rgba(7,8,12,.35);
+      border:1px solid rgba(31,42,68,.70);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      outline:none;
+      min-width: 220px;
+    }
+    .input:focus{
+      border-color: rgba(110,231,255,.55);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.08);
+    }
+    .repo-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    @media (max-width: 980px){
+      .repo-grid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px){
+      .repo-grid{ grid-template-columns: 1fr; }
+    }
+    .repo{
+      border:1px solid rgba(31,42,68,.70);
+      background: rgba(13,18,32,.62);
+      border-radius: 16px;
+      padding: 14px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+    }
+    .repo:hover{
+      transform: translateY(-2px);
+      border-color: rgba(255,77,125,.45);
+      background: rgba(13,18,32,.72);
+    }
+    .repo::before{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background: radial-gradient(240px 140px at var(--mx, 40%) var(--my, 30%), rgba(110,231,255,.18), transparent 55%);
+      opacity:0;
+      transition: opacity .18s ease;
+      pointer-events:none;
+    }
+    .repo:hover::before{ opacity:1; }
+    .repo h3{
+      margin:0 0 6px;
+      font-size: 15px;
+      letter-spacing:.02em;
+    }
+    .repo p{
+      margin:0 0 10px;
+      color: rgba(233,236,244,.80);
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 38px;
+    }
+    .meta{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      color: var(--muted);
+      font-size: 12px;
+      flex-wrap:wrap;
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border:1px solid rgba(31,42,68,.70);
+      background: rgba(7,8,12,.25);
+    }
+    .tag i{
+      width:8px; height:8px; border-radius:50%;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display:inline-block;
+    }
+
+    /* Footer contact */
+    .footer{
+      margin-top: 18px;
+      padding: 18px 0 0;
+      border-top:1px solid rgba(31,42,68,.55);
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+      z-index:50;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .modal{
+      width:min(720px, 100%);
+      border-radius: 18px;
+      border:1px solid rgba(31,42,68,.85);
+      background: var(--panel2);
+      box-shadow: 0 40px 120px rgba(0,0,0,.65);
+      overflow:hidden;
+    }
+    .modal-head{
+      padding: 14px 16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid rgba(31,42,68,.55);
+      gap: 10px;
+    }
+    .modal-head b{
+      letter-spacing:.03em;
+    }
+    .modal-body{
+      padding: 16px;
+      color: rgba(233,236,244,.88);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .modal-actions{
+      padding: 14px 16px;
+      border-top:1px solid rgba(31,42,68,.55);
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    /* Small helper */
+    .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="motion-bg" aria-hidden="true"></canvas>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <header class="nav" role="banner">
+    <div class="nav-inner">
+      <div class="brand" title="Landing V2">
+        <div class="brand-badge" aria-hidden="true"></div>
+        <span>PORTFOLIO V2</span>
+      </div>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#home">Home</a>
+        <a href="#contact">Contact Us</a>
+        <a href="#about">About</a>
+        <a href="#faq">FAQ</a>
+        <a href="#login">Log In</a>
+        <a href="#projects">Projects</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn" id="bgToggle" type="button" aria-pressed="true">Motion On</button>
+        <button class="btn primary" id="openProjects" type="button">View Projects</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Section 1: Home + Contact (Hero container) -->
+    <section class="section" id="home">
+      <div class="wrap">
+        <div class="panel">
+          <div class="hero">
+            <div>
+              <div class="kicker">
+                <span class="pill"><span class="dot"></span>Interactive motion background</span>
+                <span class="pill">Smooth scrolling</span>
+                <span class="pill">GitHub projects</span>
+              </div>
+
+              <h1>DELIVER CLEAN BUILDS FAST</h1>
+              <p>
+                Version 2 adds a high density animated vector field behind the UI.  Hover, move the mouse, and click the background to trigger bursts.
+                Scroll to move through three full width containers.  The Projects section loads your public repos automatically.
+              </p>
+
+              <div class="cta-row">
+                <a class="btn primary" href="#projects">Go To Projects</a>
+                <a class="btn" href="#about">See About</a>
+                <a class="btn" href="#contact">Contact Us</a>
+              </div>
+
+              <div class="mini" id="contact">
+                Contact: <b>hello@yourdomain.com</b>  |  Location: Remote  |  Focus: Web, UI, and security minded builds
+              </div>
+            </div>
+
+            <aside class="statcard" aria-label="Highlights">
+              <b style="letter-spacing:.04em; text-transform:uppercase;">Live System Status</b>
+              <div class="glowline" aria-hidden="true"></div>
+              <div class="statgrid">
+                <div class="stat">
+                  <b id="shapeCount">50</b>
+                  <span>Moving shapes</span>
+                </div>
+                <div class="stat">
+                  <b id="fps">0</b>
+                  <span>FPS target</span>
+                </div>
+                <div class="stat">
+                  <b id="cursorMode">Repel</b>
+                  <span>Pointer interaction</span>
+                </div>
+                <div class="stat">
+                  <b id="burstCount">0</b>
+                  <span>Click bursts</span>
+                </div>
+              </div>
+
+              <div class="glowline" aria-hidden="true"></div>
+              <div class="mini">
+                Tip: hover repo cards for a reactive glow.  Click a repo to open details.
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: About + FAQ (Second container) -->
+    <section class="section" id="about">
+      <div class="wrap">
+        <div class="panel">
+          <div class="two-col">
+            <div class="card">
+              <h2>About</h2>
+              <p>
+                This landing page is built to feel premium and technical.  The background is not a video.  It is a realtime vector scene drawn on canvas, tuned for smooth motion and
+                interactive behavior.  The UI stays readable because the shapes stay behind a soft glass layer and react to your cursor rather than fighting it.
+              </p>
+              <div class="bullets">
+                <div class="bullet">
+                  <div class="ico" aria-hidden="true"></div>
+                  <div>
+                    <b>Three container scroll layout</b>
+                    <span>Hero, About plus FAQ, Projects and Login</span>
+                  </div>
+                </div>
+                <div class="bullet">
+                  <div class="ico" aria-hidden="true" style="background: linear-gradient(135deg, rgba(255,77,125,.75), rgba(110,231,255,.55));"></div>
+                  <div>
+                    <b>Motion layer stays interactive</b>
+                    <span>Mouse repel, click bursts, scroll parallax</span>
+                  </div>
+                </div>
+                <div class="bullet">
+                  <div class="ico" aria-hidden="true" style="background: linear-gradient(135deg, rgba(49,208,170,.75), rgba(110,231,255,.55));"></div>
+                  <div>
+                    <b>GitHub repo loader</b>
+                    <span>Fetches public repositories with no key</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" id="faq">
+              <h2>FAQ</h2>
+              <p>
+                <b>How do I connect my GitHub?</b><br />
+                Enter your username in Projects and click Load.  It saves locally so you only do it once.
+                <br /><br />
+                <b>How do I turn motion off?</b><br />
+                Use the Motion toggle in the top right.  It pauses animation and reduces GPU use.
+                <br /><br />
+                <b>Can I deploy this?</b><br />
+                Yes.  Put this file in a repo and enable GitHub Pages or deploy with Netlify.
+              </p>
+
+              <div style="height:14px"></div>
+
+              <div class="card" id="login" style="background: rgba(7,8,12,.25);">
+                <h2>Log In</h2>
+                <p style="margin-bottom:12px;">
+                  This is a front end demo login panel.  If you want, I can wire it to Supabase next.
+                </p>
+                <label class="sr-only" for="email">Email</label>
+                <input class="input" id="email" type="email" placeholder="Email" autocomplete="email" />
+                <div style="height:10px"></div>
+                <label class="sr-only" for="password">Password</label>
+                <input class="input" id="password" type="password" placeholder="Password" autocomplete="current-password" />
+                <div style="height:12px"></div>
+                <button class="btn primary" id="loginBtn" type="button">Log In</button>
+                <span id="loginMsg" style="margin-left:10px;color:var(--muted);font-size:12px;"></span>
+              </div>
+
+              <div style="height:10px"></div>
+
+              <div class="mini" id="contact-us">
+                Contact Us: Use the email above or link this button to a form endpoint when ready.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Projects (Third container) -->
+    <section class="section" id="projects">
+      <div class="wrap">
+        <div class="panel">
+          <div class="projects">
+            <div class="projects-head">
+              <div>
+                <h2>Projects</h2>
+                <p>
+                  Loads public GitHub repositories and displays them as interactive cards.  Hover for glow.  Click a card for details.
+                </p>
+              </div>
+
+              <div class="userbox" aria-label="GitHub loader">
+                <label class="sr-only" for="ghUser">GitHub Username</label>
+                <input class="input" id="ghUser" type="text" inputmode="text" placeholder="GitHub username" />
+                <button class="btn primary" id="loadRepos" type="button">Load</button>
+                <button class="btn" id="clearUser" type="button">Reset</button>
+              </div>
+            </div>
+
+            <div class="glowline" aria-hidden="true"></div>
+
+            <div id="repoStatus" class="mini" style="min-height:18px;"></div>
+            <div class="repo-grid" id="repoGrid" aria-live="polite"></div>
+
+            <div class="footer">
+              <span>Built for speed, clarity, and strong visual presence.</span>
+              <span>Tip: Click the background for bursts.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-label="Repository details">
+    <div class="modal">
+      <div class="modal-head">
+        <b id="modalTitle">Repo</b>
+        <button class="btn" id="closeModal" type="button">Close</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions">
+        <button class="btn" id="openRepo" type="button">Open Repo</button>
+        <button class="btn primary" id="copyClone" type="button">Copy Clone URL</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Smooth scroll for anchor links
+    (function(){
+      document.querySelectorAll('a[href^="#"]').forEach(a=>{
+        a.addEventListener('click', (e)=>{
+          const id = a.getAttribute('href');
+          const el = document.querySelector(id);
+          if(!el) return;
+          e.preventDefault();
+          el.scrollIntoView({behavior:'smooth', block:'start'});
+          history.replaceState(null,'',id);
+        });
+      });
+    })();
+
+    // Demo login
+    (function(){
+      const btn = document.getElementById('loginBtn');
+      const msg = document.getElementById('loginMsg');
+      btn.addEventListener('click', ()=>{
+        const email = (document.getElementById('email').value || '').trim();
+        const pass = (document.getElementById('password').value || '').trim();
+        if(!email || !pass){
+          msg.textContent = "Enter email and password.";
+          return;
+        }
+        msg.textContent = "Demo only.  Add Supabase to make it real.";
+      });
+    })();
+
+    // GitHub Projects loader
+    (function(){
+      const KEY = "landing_v2_gh_user";
+      const input = document.getElementById('ghUser');
+      const loadBtn = document.getElementById('loadRepos');
+      const clearBtn = document.getElementById('clearUser');
+      const grid = document.getElementById('repoGrid');
+      const status = document.getElementById('repoStatus');
+
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+      const closeModal = document.getElementById('closeModal');
+      const openRepo = document.getElementById('openRepo');
+      const copyClone = document.getElementById('copyClone');
+
+      let currentRepo = null;
+
+      function setStatus(text){ status.textContent = text || ""; }
+
+      function escapeHtml(s){
+        return String(s || "")
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll('"',"&quot;")
+          .replaceAll("'","&#039;");
+      }
+
+      function openModal(repo){
+        currentRepo = repo;
+        modalTitle.textContent = repo.name || "Repository";
+        const desc = repo.description ? escapeHtml(repo.description) : "No description provided.";
+        const lang = repo.language ? escapeHtml(repo.language) : "Unknown";
+        const stars = repo.stargazers_count ?? 0;
+        const forks = repo.forks_count ?? 0;
+        const issues = repo.open_issues_count ?? 0;
+        const updated = repo.updated_at ? new Date(repo.updated_at).toLocaleString() : "Unknown";
+
+        modalBody.innerHTML =
+          "<div style='display:grid;gap:10px'>" +
+            "<div><b>Description</b><div style='color:rgba(233,236,244,.86)'>" + desc + "</div></div>" +
+            "<div style='display:flex;gap:10px;flex-wrap:wrap'>" +
+              "<span class='tag'><i></i>Language: " + lang + "</span>" +
+              "<span class='tag'><i></i>Stars: " + stars + "</span>" +
+              "<span class='tag'><i></i>Forks: " + forks + "</span>" +
+              "<span class='tag'><i></i>Open Issues: " + issues + "</span>" +
+            "</div>" +
+            "<div><b>Updated</b><div style='color:rgba(233,236,244,.80)'>" + escapeHtml(updated) + "</div></div>" +
+          "</div>";
+
+        modalBackdrop.style.display = "flex";
+      }
+
+      function close(){
+        modalBackdrop.style.display = "none";
+        currentRepo = null;
+      }
+
+      closeModal.addEventListener('click', close);
+      modalBackdrop.addEventListener('click', (e)=>{
+        if(e.target === modalBackdrop) close();
+      });
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === "Escape") close();
+      });
+
+      openRepo.addEventListener('click', ()=>{
+        if(!currentRepo) return;
+        window.open(currentRepo.html_url, "_blank", "noopener,noreferrer");
+      });
+
+      copyClone.addEventListener('click', async ()=>{
+        if(!currentRepo) return;
+        const url = currentRepo.clone_url || currentRepo.ssh_url || currentRepo.html_url;
+        try{
+          await navigator.clipboard.writeText(url);
+          copyClone.textContent = "Copied";
+          setTimeout(()=> copyClone.textContent = "Copy Clone URL", 900);
+        }catch{
+          copyClone.textContent = "Copy failed";
+          setTimeout(()=> copyClone.textContent = "Copy Clone URL", 900);
+        }
+      });
+
+      async function loadRepos(user){
+        grid.innerHTML = "";
+        setStatus("Loading repositories for " + user + " ...");
+        try{
+          const res = await fetch("https://api.github.com/users/" + encodeURIComponent(user) + "/repos?per_page=60&sort=updated");
+          if(!res.ok){
+            setStatus("Could not load repos.  Check the username.");
+            return;
+          }
+          const repos = await res.json();
+
+          // Keep it clean: show up to 18 repos, prefer non forks
+          const filtered = repos
+            .filter(r=> !r.fork)
+            .slice(0, 18);
+
+          if(filtered.length === 0){
+            setStatus("No public repos found for that user.");
+            return;
+          }
+
+          setStatus("Loaded " + filtered.length + " repositories.");
+
+          filtered.forEach(repo=>{
+            const card = document.createElement('div');
+            card.className = "repo";
+            card.tabIndex = 0;
+
+            const desc = repo.description ? repo.description : "No description provided.";
+            const lang = repo.language ? repo.language : "Unknown";
+            const stars = repo.stargazers_count ?? 0;
+            const updated = repo.updated_at ? new Date(repo.updated_at).toLocaleDateString() : "Unknown";
+
+            card.innerHTML =
+              "<h3>" + escapeHtml(repo.name) + "</h3>" +
+              "<p>" + escapeHtml(desc) + "</p>" +
+              "<div class='meta'>" +
+                "<span class='tag'><i></i>" + escapeHtml(lang) + "</span>" +
+                "<span class='tag'><i></i>Stars " + stars + "</span>" +
+                "<span class='tag'><i></i>Updated " + escapeHtml(updated) + "</span>" +
+              "</div>";
+
+            card.addEventListener('mousemove', (e)=>{
+              const r = card.getBoundingClientRect();
+              const mx = ((e.clientX - r.left) / r.width) * 100;
+              const my = ((e.clientY - r.top) / r.height) * 100;
+              card.style.setProperty("--mx", mx + "%");
+              card.style.setProperty("--my", my + "%");
+            });
+
+            const open = ()=> openModal(repo);
+            card.addEventListener('click', open);
+            card.addEventListener('keydown', (e)=>{
+              if(e.key === "Enter" || e.key === " "){
+                e.preventDefault();
+                open();
+              }
+            });
+
+            grid.appendChild(card);
+          });
+        }catch{
+          setStatus("Network error while loading repos.");
+        }
+      }
+
+      function getSavedUser(){
+        return (localStorage.getItem(KEY) || "").trim();
+      }
+      function setSavedUser(u){
+        localStorage.setItem(KEY, u);
+      }
+
+      const saved = getSavedUser();
+      if(saved){
+        input.value = saved;
+        loadRepos(saved);
+      }else{
+        setStatus("Enter your GitHub username and click Load.");
+      }
+
+      loadBtn.addEventListener('click', ()=>{
+        const user = (input.value || "").trim();
+        if(!user){
+          setStatus("Please enter a GitHub username.");
+          return;
+        }
+        setSavedUser(user);
+        loadRepos(user);
+      });
+
+      clearBtn.addEventListener('click', ()=>{
+        localStorage.removeItem(KEY);
+        input.value = "";
+        grid.innerHTML = "";
+        setStatus("Reset.  Enter your GitHub username and click Load.");
+      });
+
+      document.getElementById('openProjects').addEventListener('click', ()=>{
+        document.querySelector("#projects").scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    })();
+
+    // Interactive motion background: 50 mini high resolution vector style shapes on canvas
+    (function(){
+      const canvas = document.getElementById('motion-bg');
+      const ctx = canvas.getContext('2d', { alpha: true });
+
+      const fpsEl = document.getElementById('fps');
+      const burstEl = document.getElementById('burstCount');
+      const shapeCountEl = document.getElementById('shapeCount');
+      const cursorModeEl = document.getElementById('cursorMode');
+      const toggleBtn = document.getElementById('bgToggle');
+
+      let W = 0, H = 0, DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      let running = true;
+
+      const pointer = { x: 0, y: 0, active: false };
+      let bursts = 0;
+
+      function resize(){
+        W = window.innerWidth;
+        H = window.innerHeight;
+        DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        canvas.width = Math.floor(W * DPR);
+        canvas.height = Math.floor(H * DPR);
+        canvas.style.width = W + "px";
+        canvas.style.height = H + "px";
+        ctx.setTransform(DPR,0,0,DPR,0,0);
+      }
+      window.addEventListener('resize', resize, { passive:true });
+      resize();
+
+      function rand(min,max){ return min + Math.random()*(max-min); }
+      function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+      // "High res" look: draw gradients, strokes, and subtle highlights
+      const palette = [
+        { a:[255,77,125], b:[110,231,255] },
+        { a:[110,231,255], b:[49,208,170] },
+        { a:[255,172,76], b:[255,77,125] },
+        { a:[160,122,255], b:[110,231,255] }
+      ];
+
+      const shapes = [];
+      const N = 50; // over 40
+      shapeCountEl.textContent = String(N);
+
+      // Each shape: type 0 circle, 1 rounded square, 2 triangle, 3 hex
+      for(let i=0;i<N;i++){
+        const p = palette[(Math.random()*palette.length)|0];
+        shapes.push({
+          x: rand(0, W),
+          y: rand(0, H),
+          vx: rand(-0.45, 0.45),
+          vy: rand(-0.40, 0.40),
+          r: rand(7, 18),
+          rot: rand(0, Math.PI*2),
+          vr: rand(-0.01, 0.01),
+          type: (Math.random()*4)|0,
+          alpha: rand(0.35, 0.85),
+          glow: rand(0.12, 0.28),
+          a: p.a,
+          b: p.b,
+          z: rand(0.2, 1.0) // parallax depth
+        });
+      }
+
+      // Particles for bursts
+      const particles = [];
+      function spawnBurst(x,y){
+        bursts += 1;
+        burstEl.textContent = String(bursts);
+        const count = 24;
+        for(let i=0;i<count;i++){
+          const ang = Math.random()*Math.PI*2;
+          const sp = rand(1.4, 4.6);
+          const p = palette[(Math.random()*palette.length)|0];
+          particles.push({
+            x,y,
+            vx: Math.cos(ang)*sp,
+            vy: Math.sin(ang)*sp,
+            life: rand(26, 52),
+            r: rand(2, 4.6),
+            a: p.a,
+            b: p.b
+          });
+        }
+      }
+
+      canvas.addEventListener('mousemove', (e)=>{
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+        pointer.active = true;
+      }, { passive:true });
+
+      canvas.addEventListener('mouseleave', ()=>{
+        pointer.active = false;
+      });
+
+      canvas.addEventListener('click', (e)=>{
+        spawnBurst(e.clientX, e.clientY);
+      });
+
+      // Parallax on scroll
+      let scrollY = window.scrollY || 0;
+      window.addEventListener('scroll', ()=>{
+        scrollY = window.scrollY || 0;
+      }, { passive:true });
+
+      // FPS meter
+      let last = performance.now();
+      let acc = 0, frames = 0, fps = 0;
+
+      function drawShape(s, x, y){
+        const r = s.r;
+        const a = s.a, b = s.b;
+
+        // gradient fill
+        const gx = x + Math.cos(s.rot)*r*1.2;
+        const gy = y + Math.sin(s.rot)*r*1.2;
+        const grad = ctx.createLinearGradient(x-r, y-r, gx, gy);
+        grad.addColorStop(0, `rgba(${a[0]},${a[1]},${a[2]},${s.alpha})`);
+        grad.addColorStop(1, `rgba(${b[0]},${b[1]},${b[2]},${s.alpha*0.92})`);
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(s.rot);
+
+        // glow
+        ctx.shadowColor = `rgba(${b[0]},${b[1]},${b[2]},${s.glow})`;
+        ctx.shadowBlur = 18;
+
+        // body
+        ctx.fillStyle = grad;
+        ctx.strokeStyle = `rgba(255,255,255,${0.14})`;
+        ctx.lineWidth = 1;
+
+        if(s.type === 0){
+          ctx.beginPath();
+          ctx.arc(0,0,r,0,Math.PI*2);
+          ctx.fill();
+          ctx.stroke();
+          // highlight
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = `rgba(255,255,255,${0.12})`;
+          ctx.beginPath();
+          ctx.arc(-r*0.22, -r*0.22, r*0.35, 0, Math.PI*2);
+          ctx.fill();
+        }else if(s.type === 1){
+          const rr = Math.max(3, r*0.45);
+          const w = r*1.75, h = r*1.75;
+          roundRect(ctx, -w/2, -h/2, w, h, rr);
+          ctx.fill();
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = `rgba(255,255,255,${0.10})`;
+          roundRect(ctx, -w/2 + 2, -h/2 + 2, w*0.55, h*0.42, rr);
+          ctx.fill();
+        }else if(s.type === 2){
+          ctx.beginPath();
+          ctx.moveTo(0, -r*1.1);
+          ctx.lineTo(r*1.0, r*1.0);
+          ctx.lineTo(-r*1.0, r*1.0);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = `rgba(255,255,255,${0.10})`;
+          ctx.beginPath();
+          ctx.moveTo(0, -r*0.65);
+          ctx.lineTo(r*0.55, r*0.40);
+          ctx.lineTo(-r*0.55, r*0.40);
+          ctx.closePath();
+          ctx.fill();
+        }else{
+          const pts = 6;
+          ctx.beginPath();
+          for(let i=0;i<pts;i++){
+            const ang = (Math.PI*2/pts)*i;
+            const px = Math.cos(ang)*r*1.05;
+            const py = Math.sin(ang)*r*1.05;
+            if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = `rgba(255,255,255,${0.10})`;
+          ctx.beginPath();
+          for(let i=0;i<pts;i++){
+            const ang = (Math.PI*2/pts)*i;
+            const px = Math.cos(ang)*r*0.60;
+            const py = Math.sin(ang)*r*0.60;
+            if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+          }
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      function roundRect(ctx, x, y, w, h, r){
+        const rr = Math.min(r, w/2, h/2);
+        ctx.beginPath();
+        ctx.moveTo(x+rr, y);
+        ctx.arcTo(x+w, y, x+w, y+h, rr);
+        ctx.arcTo(x+w, y+h, x, y+h, rr);
+        ctx.arcTo(x, y+h, x, y, rr);
+        ctx.arcTo(x, y, x+w, y, rr);
+        ctx.closePath();
+      }
+
+      function step(t){
+        if(running){
+          ctx.clearRect(0,0,W,H);
+
+          // Soft vignette
+          const vg = ctx.createRadialGradient(W*0.5, H*0.2, 80, W*0.5, H*0.5, Math.max(W,H));
+          vg.addColorStop(0, "rgba(255,255,255,0.00)");
+          vg.addColorStop(1, "rgba(0,0,0,0.35)");
+          ctx.fillStyle = vg;
+          ctx.fillRect(0,0,W,H);
+
+          // Pointer force
+          const px = pointer.x;
+          const py = pointer.y;
+          const repelRadius = 140;
+          const repelPower = 0.045;
+          cursorModeEl.textContent = "Repel";
+
+          // Parallax factor
+          const par = (scrollY % (H*2)) / (H*2);
+
+          for(const s of shapes){
+            // drift
+            s.x += s.vx;
+            s.y += s.vy;
+            s.rot += s.vr;
+
+            // wrap
+            if(s.x < -40) s.x = W + 40;
+            if(s.x > W + 40) s.x = -40;
+            if(s.y < -40) s.y = H + 40;
+            if(s.y > H + 40) s.y = -40;
+
+            // cursor repel
+            if(pointer.active){
+              const dx = s.x - px;
+              const dy = s.y - py;
+              const d2 = dx*dx + dy*dy;
+              if(d2 < repelRadius*repelRadius){
+                const d = Math.sqrt(d2) || 1;
+                const nx = dx / d;
+                const ny = dy / d;
+                s.vx += nx * repelPower * (1 - d/repelRadius) * 10;
+                s.vy += ny * repelPower * (1 - d/repelRadius) * 10;
+              }
+            }
+
+            // damp velocity
+            s.vx *= 0.985;
+            s.vy *= 0.985;
+
+            // keep motion alive
+            s.vx += rand(-0.01, 0.01);
+            s.vy += rand(-0.01, 0.01);
+
+            // draw with slight parallax shift
+            const yShift = (par - 0.5) * 120 * s.z;
+            drawShape(s, s.x, s.y + yShift);
+          }
+
+          // Burst particles
+          for(let i=particles.length-1;i>=0;i--){
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.985;
+            p.vy *= 0.985;
+            p.life -= 1;
+
+            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r*4.5);
+            g.addColorStop(0, `rgba(${p.a[0]},${p.a[1]},${p.a[2]},0.75)`);
+            g.addColorStop(1, `rgba(${p.b[0]},${p.b[1]},${p.b[2]},0.00)`);
+
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r*4.5, 0, Math.PI*2);
+            ctx.fill();
+
+            if(p.life <= 0) particles.splice(i,1);
+          }
+        }
+
+        // FPS calc
+        const now = t;
+        const dt = now - last;
+        last = now;
+        acc += dt;
+        frames += 1;
+        if(acc >= 500){
+          fps = Math.round((frames * 1000) / acc);
+          fpsEl.textContent = String(fps);
+          acc = 0;
+          frames = 0;
+        }
+
+        requestAnimationFrame(step);
+      }
+
+      toggleBtn.addEventListener('click', ()=>{
+        running = !running;
+        toggleBtn.textContent = running ? "Motion On" : "Motion Off";
+        toggleBtn.setAttribute("aria-pressed", running ? "true" : "false");
+      });
+
+      requestAnimationFrame(step);
+    })();
+  </script>
+</body>
+</html>
